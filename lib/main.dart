@@ -24,6 +24,7 @@ class _ScannerPageState extends State<ScannerPage> {
   final _ble = FlutterReactiveBle();
   StreamSubscription<DiscoveredDevice>? _scanSubscription;
   List<DiscoveredDevice> _discoveredDevices = [];
+  bool _isScanning = false;
 
   @override
   void dispose() {
@@ -42,11 +43,17 @@ class _ScannerPageState extends State<ScannerPage> {
         print('Error : $error');
       },
     );
+    setState(() {
+      _isScanning = true; // 스캔 중인 상태로 설정
+    });
   }
 
   void _stopScan() {
     _scanSubscription?.cancel();
-    _discoveredDevices.clear();
+    setState(() {
+      _discoveredDevices.clear(); // 초기화
+      _isScanning = false; // 스캔 중이 아닌 상태로 설정
+    });
   }
 
   @override
@@ -57,8 +64,8 @@ class _ScannerPageState extends State<ScannerPage> {
       ),
       body: _buildDeviceList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _scanSubscription != null ? _stopScan : _startScan,
-        child: Icon(_scanSubscription != null ? Icons.stop : Icons.play_arrow),
+        onPressed: _isScanning ? _stopScan : _startScan,
+        child: Icon(_isScanning ? Icons.stop : Icons.play_arrow),
       ),
     );
   }
