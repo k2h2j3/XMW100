@@ -100,7 +100,12 @@ class _ScannerPageState extends State<ScannerPage> {
         final device = _discoveredDevices[index];
         return ListTile(
           title: Text(device.name ?? 'Unknown'),
-          subtitle: Text(device.id),
+          subtitle: Column(
+            children: [
+              Text('ID: ${device.id}'),
+              Text('신호세기 : ${device.rssi}'),
+            ],
+          ),
           onTap: () {
             // 연결하거나 해당 장치와 상호작용하는 작업을 수행
             print('Tapped on device: ${device.id}');
