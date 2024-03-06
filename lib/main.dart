@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: ScannerPage(),
     );
   }
@@ -27,9 +29,30 @@ class _ScannerPageState extends State<ScannerPage> {
   bool _isScanning = false;
 
   @override
-  void dispose() {
-    _stopScan();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _requestLocationPermission();
+  }
+
+  void _requestLocationPermission() async {
+    var status = await Permission.location.request();
+    if(status.isGranted) {
+      _startScan();
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Location Permission Required'),
+            content: Text('This app requires location permission to scan for BLE devices'),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+              ),
+            ],
+          ),
+      );
+    }
   }
 
   void _startScan() {
